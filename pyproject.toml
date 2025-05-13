@@ -1,17 +1,15 @@
 [tool.poetry]
-name = "gouvernement web task manager"
+name = "gouvernement"
 version = "0.1.0"
 description = ""
 authors = ["karbyshevillia <158076825+karbyshevillia@users.noreply.github.com>"]
 readme = "README.md"
-packages = [{include = "website"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "^3.1.0"
 flask-login = "^0.6.3"
 flask-sqlalchemy = "^3.1.1"
-website = { path="./website/", develop = true }
 
 
 [build-system]
