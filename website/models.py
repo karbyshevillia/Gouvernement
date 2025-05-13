@@ -35,4 +35,5 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     projects = db.relationship("Project", secondary=user_project, backref="collaborators")
+    supervised_projects = db.relationship("Project")
     # notes = db.relationship("Note") # like a list of note id-s
