@@ -39,6 +39,11 @@
                 <a class="nav-item nav-link" id="home" href="/views/home">Home</a>
                 {% endif %}
             </div>
+            {% if user.is_authenticated %}
+            <span class="navbar-text ml-auto">
+            <i class="fa fa-user text-gray mr-2" aria-hidden="true"></i>
+            {{ user.first_name + " | " + user.email}}</span>
+            {% endif %}
         </div>
     </nav>
 
