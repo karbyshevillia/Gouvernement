@@ -18,7 +18,9 @@ def projects():
     """
     Returns the home page of the website
     """
-    return render_template("projects.html", user=current_user)
+    projects_list = list(set(current_user.projects) | set(current_user.supervised_projects))
+    projects_supervisors = dict(zip(projects_list, [User.query.get(project.supervisor) for project in projects_list]))
+    return render_template("projects.html", user=current_user, projects_supervisors=projects_supervisors)
 
 @views.route("/editing", methods=["GET", "POST"])
 @login_required
@@ -61,6 +63,6 @@ def editing():
             db.session.add(project)
             db.session.commit()
             flash("Project initiated successfully!", category="success")
-            redirect(url_for("views.projects"))
+            return redirect(url_for("views.projects"))
 
     return render_template("projects_edit.html", user=current_user)
