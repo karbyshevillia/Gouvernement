@@ -24,7 +24,7 @@ class Project(db.Model):
     supervisor = db.Column(db.Integer, db.ForeignKey("user.id"))
     creation_date = db.Column(db.DateTime(timezone=True), default=func.now())
     deadline = db.Column(db.DateTime)
-    current_collaborators = db.relationship("User", secondary=user_project, backref="on_projects")
+    current_collaborators = db.relationship("User", secondary=user_project, back_populates="projects")
     # tasks
     status = db.Column(db.Boolean)
 
@@ -34,6 +34,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
-    projects = db.relationship("Project", secondary=user_project, backref="collaborators")
+    projects = db.relationship("Project",
+                               secondary=user_project,
+                               back_populates="current_collaborators")
     supervised_projects = db.relationship("Project")
     # notes = db.relationship("Note") # like a list of note id-s

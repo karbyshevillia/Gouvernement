@@ -1,1 +1,14 @@
 {% extends "projects_init.html" %}
+
+{% block default_title %} {{ project.title }} {% endblock %}
+{% block default_priority %} {{ project.priority }} {% endblock %}
+{% block default_description %} {{ project.description }} {% endblock %}
+{% block default_deadline %} {{ project.deadline }} {% endblock %}
+{% block default_collaborators %} {{ collaborators_string }} {% endblock %}
+{% block default_status %} {{ project.status|int }} {% endblock %}
+
+{% block commit_button %} Save Changes {% endblock %}
+
+{% block discard_button %}
+    <a href="/views/projects/{{ project.id }}" class="btn btn-outline-primary ml-2">Discard Changes</a>
+{% endblock %}

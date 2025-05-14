@@ -69,8 +69,56 @@ def initiate():
 @views.route("/projects/<project_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_project_info(project_id):
+    if request.method == "POST":
+        title = request.form.get("title")
+        priority = request.form.get("priority")
+        description = request.form.get("description")
+        deadline = request.form.get("deadline")
+        collaborators = request.form.get("collaborators")
+        status = request.form.get("status")
 
+        clb, val = collaborators_input_is_valid(collaborators)
+        deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
+        status = bool(status)
+        # print(clb, val)
+        # print(deadline)
 
+        if len(title) > 200:
+            flash("The project title is too long (>200 characters).", category="error")
+        elif len(description) > 1200:
+            flash("The project description is too long (>1200 characters).", category="error")
+        elif not val:
+            flash("The collaborators field is either improperly filled out, "
+                  "or some email is unregistered.", category="error")
+        else:
+            project = Project.query.get(project_id)
+            project.title = title
+            project.priority = priority
+            project.description = description
+            project.deadline = deadline
+            project.current_collaborators = clb
+            project.status = status
+            db.session.commit()
+            flash("Project info updated successfully!", category="success")
+            return redirect(f"/views/projects/{project_id}")
+
+    project = Project.query.get(project_id)
+    collaborators_string = ", ".join([user.email for user in project.current_collaborators])
+    return render_template("projects_edit.html",
+                           user=current_user,
+                           project=project,
+                           collaborators_string=collaborators_string)
+
+@views.route("/projects/<project_id>/delete", methods=["POST"])
+@login_required
+def delete_project(project_id):
+    project = Project.query.get(project_id)
+    was = project.title
+    project.current_collaborators.clear()
+    db.session.delete(project)
+    db.session.commit()
+    flash(f"Project {was} has been deleted.", "success")
+    return redirect(url_for("views.projects"))
 
 @views.route("/projects/<project_id>")
 @login_required

@@ -12,7 +12,8 @@
             class="form-control"
             id="title"
             name="title"
-            placeholder="Enter project title">
+            placeholder="Enter project title"
+            value="{% block default_title %}{% endblock %}">
     </div>
     <div class="form-group">
         <label for="priority">Priority</label>
@@ -23,7 +24,8 @@
             name="priority"
             min = "1"
             max = "5"
-            placeholder="Enter priority ranking, 1 being the highest, 5 the lowest">
+            placeholder="Enter priority ranking, 1 being the highest, 5 the lowest"
+            value="{% block default_priority %}{% endblock %}">
     </div>
     <div class="form-group">
         <label for="description">Description</label>
@@ -32,7 +34,8 @@
             class="form-control"
             id="description"
             name="description"
-            placeholder="Enter project description">
+            placeholder="Enter project description"
+            value="{% block default_description %}{% endblock %}">
     </div>
     <div class="form-group">
         <label for="deadline">Deadline</label>
@@ -41,7 +44,8 @@
             class="form-control"
             id="deadline"
             name="deadline"
-            placeholder="Set project deadline">
+            placeholder="Set project deadline"
+            value="{% block default_deadline %}{% endblock %}">
     </div>
     <div class="form-group">
         <label for="collaborators">Collaborators</label>
@@ -50,7 +54,8 @@
             class="form-control"
             id="collaborators"
             name="collaborators"
-            placeholder="Enter the emails of registered persons who shall be working on the project (separated by commas)">
+            placeholder="Enter the emails of registered persons who shall be working on the project (separated by commas)"
+            value="{% block default_collaborators %}{% endblock %}">
     </div>
     <div class="form-group">
         <label for="status">Status</label>
@@ -61,9 +66,25 @@
             name="status"
             min="0"
             max="1"
-            placeholder="Set the status of the project, 0 being 'unfinished' and 1 being 'finished'">
+            placeholder="Set the status of the project, 0 being 'unfinished' and 1 being 'finished'"
+            value="{% block default_status %}{% endblock %}">
     </div>
     <br>
-    <button type="submit" class="btn btn-primary">Create Project</button>
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary">{% block commit_button %} Initiate Project {% endblock %}</button>
+        {% block discard_button %} <a href="/views/projects" class="btn btn-outline-primary ml-2">Back to Projects</a> {% endblock %}
+    </div>
 </form>
 {% endblock %}
+
+{#
+<div class="bg-white border-top-0 d-flex justify-content-end">
+    <a href="/views/projects/{{ project.id }}/edit" class="btn btn-outline-primary mr-2">
+      Edit
+    </a>
+    <form action="/views/projects/{{ project.id }}/delete" method="POST" style="display:inline;">
+      <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+    </form>
+  </div>
+
+#}
