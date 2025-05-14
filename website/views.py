@@ -22,12 +22,11 @@ def projects():
     projects_supervisors = dict(zip(projects_list, [User.query.get(project.supervisor) for project in projects_list]))
     return render_template("projects.html", user=current_user, projects_supervisors=projects_supervisors)
 
-@views.route("/editing", methods=["GET", "POST"])
+@views.route("/initiate", methods=["GET", "POST"])
 @login_required
-def editing():
+def initiate():
     """
     Returns the web page where a new project is created
-    or an old one is modified
     """
     if request.method == "POST":
         title = request.form.get("title")
@@ -65,4 +64,26 @@ def editing():
             flash("Project initiated successfully!", category="success")
             return redirect(url_for("views.projects"))
 
-    return render_template("projects_edit.html", user=current_user)
+    return render_template("projects_init.html", user=current_user)
+
+@views.route("/projects/<project_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_project_info(project_id):
+
+
+
+@views.route("/projects/<project_id>")
+@login_required
+def projects_info(project_id):
+    """
+    Shews information about a Project as accessed
+    through the Projects tab by clicking on a Project
+    """
+    project = Project.query.get(project_id)
+    supervisor = User.query.get(project.supervisor).email
+    collaborator_emails = [user.email for user in project.current_collaborators]
+    return render_template("projects_info.html",
+                           user=current_user,
+                           project=project,
+                           supervisor=supervisor,
+                           collaborator_emails=collaborator_emails)

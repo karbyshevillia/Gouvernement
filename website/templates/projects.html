@@ -4,14 +4,23 @@
 
 {% block content %}
 <h1 class="text-center pt-5">Projects</h1>
-<a href="/views/editing">
-    <button type="button" class="btn btn-primary">Initiate Project</button>
-</a>
+<br>
+<div class="d-flex justify-content-between">
+  <a href="/views/initiate" class="mr-3">
+      <button type="button" class="btn btn-primary font-weight-bold">Initiate Project</button>
+  </a>
+  <form method="POST" class="flex-grow-1">
+    <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Enter filters" name="filters">
+    <button class="btn btn-outline-secondary ml-3" type="submit">Search</button>
+  </div>
+  </form>
+</div>
 <br>
 {% for project, supervisor in projects_supervisors.items() %}
 <div class="row mt-4">
   <div class="col-md-12 col-lg-12 mb-4">
-    <a href="/your-target-url" class="text-decoration-none">
+    <a href="/views/projects/{{ project.id }}" class="text-decoration-none">
       <div class="card h-100 shadow-sm border-primary clickable-box">
         <div class="card-body">
           <div class="d-flex justify-content-between">
