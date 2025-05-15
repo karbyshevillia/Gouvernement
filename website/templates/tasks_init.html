@@ -72,7 +72,7 @@
     <br>
     <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary">{% block commit_button %} Assign Task {% endblock %}</button>
-        {% block discard_button %} <a href="/views/projects" class="btn btn-outline-primary ml-2">Back to Project Info</a> {% endblock %}
+        {% block discard_button %} <a href="/views/projects/{{ parent_project_id }}" class="btn btn-outline-primary ml-2">Back to Project Info</a> {% endblock %}
     </div>
 </form>
 {% endblock %}

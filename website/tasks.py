@@ -56,7 +56,9 @@ def task_initiate(parent_project_id):
             flash("Task initiated successfully!", category="success")
             return redirect(f"/views/projects/{parent_project_id}")
 
-    return render_template("tasks_init.html", user=current_user)
+    return render_template("tasks_init.html",
+                           user=current_user,
+                           parent_project_id=parent_project_id)
 
 
 @tasks.route("/<parent_project_id>/task<task_id>")
