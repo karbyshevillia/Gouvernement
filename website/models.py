@@ -4,14 +4,9 @@ This file contains code related to the contents of the main database.
 
 from . import db
 from flask_login import UserMixin
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, case, select
 from sqlalchemy.ext.hybrid import hybrid_property
 
-# class Note(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     data = db.Column(db.String(10000))
-#     date = db.Column(db.DateTime(timezone=True), default=func.now())
-#     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 user_project = db.Table("user_project",
                         db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
@@ -27,11 +22,12 @@ class Project(db.Model):
     priority = db.Column(db.Integer)
     description = db.Column(db.String(1200))
     supervisor = db.Column(db.Integer, db.ForeignKey("user.id"))
+    supervisor_user = db.relationship("User", back_populates="supervised_projects")
     creation_date = db.Column(db.DateTime(timezone=True), default=func.now())
     deadline = db.Column(db.DateTime)
     current_collaborators = db.relationship("User", secondary=user_project, back_populates="projects")
-    # tasks
     status = db.Column(db.Boolean)
+
 
     @hybrid_property
     def progress(self):
@@ -39,9 +35,22 @@ class Project(db.Model):
         bool_list = [task.status for task in lst]
         if len(bool_list) == 0:
             return 100
-        in_calc = [e for e in bool_list if e]
+        in_calc = [e for e in bool_list if not e]
         return int(len(in_calc) / len(bool_list) * 100)
 
+    @progress.expression
+    def progress(cls):
+        total = func.count(Task.id)
+        completed = func.sum(case((Task.status == True, 1), else_=0))
+        pct_expr = case(
+            (total == 0, 100),
+            else_=completed * 100.0 / total
+        )
+        return (
+            select(pct_expr)
+            .where(Task.parent_project == cls.id)
+            .scalar_subquery()
+        )
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,7 +63,8 @@ class User(db.Model, UserMixin):
     tasks = db.relationship("Task",
                                secondary=user_task,
                                back_populates="current_assignees")
-    supervised_projects = db.relationship("Project")
+    supervised_projects = db.relationship("Project", back_populates="supervisor_user")
+    assigned_tasks = db.relationship("Task", back_populates="assigned_by_user")
     has_assigned_tasks = db.relationship("Task")
 
 class Task(db.Model):
@@ -64,6 +74,7 @@ class Task(db.Model):
     priority = db.Column(db.Integer)
     description = db.Column(db.String(1200))
     assigned_by = db.Column(db.Integer, db.ForeignKey("user.id"))
+    assigned_by_user = db.relationship("User", back_populates="assigned_tasks")
     assignment_date = db.Column(db.DateTime(timezone=True), default=func.now())
     deadline = db.Column(db.DateTime)
     current_assignees = db.relationship("User", secondary=user_task, back_populates="tasks")

@@ -7,18 +7,25 @@ from .models import User, Project, Task
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
-from .aux.tools import collaborators_input_is_valid
+from .aux.tools import collaborators_input_is_valid, project_search, task_search
 from datetime import datetime
+from sqlalchemy import or_, and_
 
 views = Blueprint("views", __name__)
 
-@views.route("/projects")
+@views.route("/projects", methods=["GET", "POST"])
 @login_required
 def projects():
     """
     Returns the home page of the website
     """
-    projects_list = list(set(current_user.projects) | set(current_user.supervised_projects))
+    # projects_list = list(set(current_user.projects) | set(current_user.supervised_projects))
+    projects_list = Project.query.filter(or_(Project.supervisor == current_user.id,
+                                          Project.current_collaborators.contains(current_user)))
+    if request.method == "POST":
+        search_string = request.form.get("filters")
+        projects_list = project_search(search_string, projects_list)
+
     projects_supervisors = dict(zip(projects_list, [User.query.get(project.supervisor) for project in projects_list]))
     return render_template("projects.html", user=current_user, projects_supervisors=projects_supervisors)
 
@@ -51,12 +58,12 @@ def project_initiate():
                   "or some email is unregistered.", category="error")
         else:
             project = Project(title=title,
-                              priority=priority,
-                              description=description,
-                              supervisor=current_user.id,
-                              deadline=deadline,
-                              current_collaborators=[],
-                              status=status)
+                           priority=priority,
+                           description=description,
+                           supervisor=current_user.id,
+                           deadline=deadline,
+                           current_collaborators=[],
+                           status=status)
             project.current_collaborators.extend(clb)
             # print(project.current_collaborators)
             db.session.add(project)
@@ -120,7 +127,7 @@ def delete_project(project_id):
     flash(f"Project {was} has been deleted.", "success")
     return redirect(url_for("views.projects"))
 
-@views.route("/projects/<project_id>")
+@views.route("/projects/<project_id>", methods=["GET", "POST"])
 @login_required
 def projects_info(project_id):
     """
@@ -131,11 +138,13 @@ def projects_info(project_id):
     supervisor = User.query.get(project.supervisor).email
     collaborator_emails = [user.email for user in project.current_collaborators]
 
-    tasks_in_project = Task.query.filter_by(parent_project=project_id).all()
-    tasks_assigned = [task for task in tasks_in_project if task.assigned_by == current_user.id]
-    tasks_assignee = [task for task in tasks_in_project if current_user.id in task.current_assignees]
+    tasks_list = Task.query.filter(and_(or_(Task.assigned_by == current_user.id,
+                                       Task.current_assignees.contains(current_user)),
+                                       Task.parent_project == project_id))
+    if request.method == "POST":
+        search_string = request.form.get("filters")
+        tasks_list = task_search(search_string, tasks_list)
 
-    tasks_list = list(set(tasks_assigned + tasks_assignee))
     tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
 
     return render_template("projects_info.html",
