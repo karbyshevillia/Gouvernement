@@ -16,6 +16,10 @@ user_project = db.Table("user_project",
                         db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
                         db.Column("project_id", db.Integer, db.ForeignKey("project.id")))
 
+user_task = db.Table("user_task",
+                        db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+                        db.Column("task_id", db.Integer, db.ForeignKey("task.id")))
+
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
@@ -37,5 +41,20 @@ class User(db.Model, UserMixin):
     projects = db.relationship("Project",
                                secondary=user_project,
                                back_populates="current_collaborators")
+    tasks = db.relationship("Task",
+                               secondary=user_task,
+                               back_populates="current_assignees")
     supervised_projects = db.relationship("Project")
-    # notes = db.relationship("Note") # like a list of note id-s
+    has_assigned_tasks = db.relationship("Task")
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    parent_project = db.Column(db.Integer, db.ForeignKey("project.id"))
+    title = db.Column(db.String(200))
+    priority = db.Column(db.Integer)
+    description = db.Column(db.String(1200))
+    assigned_by = db.Column(db.Integer, db.ForeignKey("user.id"))
+    assignment_date = db.Column(db.DateTime(timezone=True), default=func.now())
+    deadline = db.Column(db.DateTime)
+    current_assignees = db.relationship("User", secondary=user_task, back_populates="tasks")
+    status = db.Column(db.Boolean)

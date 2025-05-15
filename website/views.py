@@ -3,7 +3,7 @@ This file contains the front-end views that determine the web interface.
 """
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User, Project
+from .models import User, Project, Task
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
@@ -24,7 +24,7 @@ def projects():
 
 @views.route("/initiate", methods=["GET", "POST"])
 @login_required
-def initiate():
+def project_initiate():
     """
     Returns the web page where a new project is created
     """
@@ -130,8 +130,17 @@ def projects_info(project_id):
     project = Project.query.get(project_id)
     supervisor = User.query.get(project.supervisor).email
     collaborator_emails = [user.email for user in project.current_collaborators]
+
+    tasks_in_project = Task.query.filter_by(parent_project=project_id).all()
+    tasks_assigned = [task for task in tasks_in_project if task.assigned_by == current_user.id]
+    tasks_assignee = [task for task in tasks_in_project if current_user.id in task.current_assignees]
+
+    tasks_list = list(set(tasks_assigned + tasks_assignee))
+    tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
+
     return render_template("projects_info.html",
                            user=current_user,
                            project=project,
                            supervisor=supervisor,
-                           collaborator_emails=collaborator_emails)
+                           collaborator_emails=collaborator_emails,
+                           tasks_assigned_by=tasks_assigned_by)

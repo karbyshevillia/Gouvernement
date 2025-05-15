@@ -40,16 +40,57 @@
       </dd>
     </dl>
   </div>
-  <div class="card-footer bg-white border-top-0 d-flex justify-content-end">
-    <a href="/views/projects/{{ project.id }}/edit" class="btn btn-sm btn-outline-primary mr-2">
-      Edit
-    </a>
-    <form action="/views/projects/{{ project.id }}/delete" method="POST" style="display:inline;">
-      <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-    </form>
+  <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+    <a href="/views/projects" class="btn btn-outline-primary ml-2">Back to Projects</a>
+    <div>
+      <a href="/views/projects/{{ project.id }}/edit" class="btn btn-outline-primary mr-2">
+        Edit
+      </a>
+      <form action="/views/projects/{{ project.id }}/delete" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-outline-danger">Delete</button>
+      </form>
+    </div>
   </div>
 </div>
-<div class="d-flex justify-content-start">
-  <a href="/views/projects" class="btn btn-outline-primary ml-2">Back to Projects</a>
+
+<h2 class="text-center pt-5">Related Tasks</h2>
+<div class="d-flex my-3 justify-content-between">
+  <a href="/tasks/{{ project.id }}/initiate" class="mr-3">
+      <button type="button" class="btn btn-primary font-weight-bold">Assign Task</button>
+  </a>
+  <form method="POST" class="flex-grow-1">
+    <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Enter filters" name="filters">
+    <button class="btn btn-outline-secondary ml-3" type="submit">Search</button>
+  </div>
+  </form>
 </div>
+
+{% for task, assigned_by in tasks_assigned_by.items() %}
+<div class="row mt-4">
+  <div class="col-md-12 col-lg-12 mb-4">
+    <a href="/tasks/{{ project.id }}/task{{ task.id }}" class="text-decoration-none">
+      <div class="card h-100 shadow-sm border-primary clickable-box">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span class="font-weight-bold" style="color: purple">Priority {{ task.priority }}</span>
+            <span class="font-weight-bold text-center" style="color: black">{{ "Open" if task.status else "Closed" }} | Due {{ task.deadline }}</span>
+          </div>
+          <hr class="border-dark">
+          <h5 class="card-title text-primary font-weight-bold">{{ task.title }}</h5>
+          <p class="card-text text-dark">
+            {{ task.description }}
+          </p>
+          <hr class="border-dark">
+          <div class="d-flex justify-content-between">
+            <span class="font-weight-bold" style="color: purple">Assigned by {{ assigned_by.email }} ({{ assigned_by.first_name }})</span>
+            <span class="font-weight-bold text-right" style="color: purple"> {{ task.current_assignees|length }} assignee(s)</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endfor %}
+
 {% endblock %}

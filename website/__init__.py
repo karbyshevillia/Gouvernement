@@ -18,9 +18,11 @@ def create_app():
 
     from .views import views
     from .auth import auth
+    from .tasks import tasks
 
     app.register_blueprint(views, url_prefix="/views")
     app.register_blueprint(auth, url_prefix="/auth")
+    app.register_blueprint(tasks, url_prefix="/tasks")
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
