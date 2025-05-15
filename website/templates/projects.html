@@ -26,6 +26,7 @@
           <div class="d-flex justify-content-between">
             <span class="font-weight-bold" style="color: purple">Priority {{ project.priority }}</span>
             <span class="font-weight-bold text-center" style="color: black">{{ "Open" if project.status else "Closed" }} | Due {{ project.deadline }}</span>
+            <span class="font-weight-bold" style="color: green">{{ project.progress }}%</span>
           </div>
           <hr class="border-dark">
           <h5 class="card-title text-primary font-weight-bold">{{ project.title }}</h5>

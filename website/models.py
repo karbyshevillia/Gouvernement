@@ -5,6 +5,7 @@ This file contains code related to the contents of the main database.
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from sqlalchemy.ext.hybrid import hybrid_property
 
 # class Note(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
@@ -31,6 +32,15 @@ class Project(db.Model):
     current_collaborators = db.relationship("User", secondary=user_project, back_populates="projects")
     # tasks
     status = db.Column(db.Boolean)
+
+    @hybrid_property
+    def progress(self):
+        lst = Task.query.filter_by(parent_project=self.id).all()
+        bool_list = [task.status for task in lst]
+        if len(bool_list) == 0:
+            return 100
+        in_calc = [e for e in bool_list if e]
+        return int(len(in_calc) / len(bool_list) * 100)
 
 
 class User(db.Model, UserMixin):

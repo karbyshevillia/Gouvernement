@@ -93,7 +93,7 @@ def edit_task_info(parent_project_id, task_id):
 
         clb, val = collaborators_input_is_valid(assignees)
         deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
-        status = bool(status)
+        status = bool(int(status))
         # print(clb, val)
         # print(deadline)
 
