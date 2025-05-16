@@ -87,6 +87,9 @@ def project_initiate():
                "You have to supervise this project to be able to edit its info.",
                "/views/projects/<project_id>")
 def edit_project_info(project_id):
+    """
+    Governs the page for project editing
+    """
     if request.method == "POST":
         title = request.form.get("title")
         priority = request.form.get("priority")
@@ -137,6 +140,9 @@ def edit_project_info(project_id):
                "You have to supervise this project to be able to delete it.",
                "/views/projects/<project_id>")
 def delete_project(project_id):
+    """
+    Governs the page for project deletion
+    """
     project = Project.query.get(project_id)
     was = project.title
     project.current_collaborators.clear()

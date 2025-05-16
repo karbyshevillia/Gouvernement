@@ -1,3 +1,8 @@
+"""
+Functions that generate a random database
+for project overviews
+"""
+
 from datetime import datetime, timedelta
 from faker import Faker
 from Gouvernement import db
@@ -9,6 +14,9 @@ import random
 fake = Faker()
 
 def create_sample_data():
+    """
+    Populates a random database using the Faker module
+    """
     with app.app_context():
         db.drop_all()
         db.create_all()

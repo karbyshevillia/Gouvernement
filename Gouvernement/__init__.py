@@ -41,6 +41,9 @@ def create_app():
     return app
 
 def create_database(app):
+    """
+    App database initialisation
+    """
     if not path.exists("/Users/illiaknu/Gouvernement" + DB_NAME):
         with app.app_context():
             db.create_all()

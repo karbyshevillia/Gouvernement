@@ -8,6 +8,16 @@ import datetime
 from sqlalchemy.sql import desc, or_
 
 def collaborators_input_is_valid(string) -> tuple[list, bool]:
+    """
+    Checks of a given string is a valid string of emails
+    that correspond to registered accounts in the database.
+
+    Returns a tuple (list, bool), where `list` is a list
+    of identified users, and `bool` is True if the string
+    is valid, and False otherwise.
+
+    If bool == False, list is set to an empty list.
+    """
     if not string:
         return [], True
     lst = [email.strip() for email in string.split(",")]
@@ -22,6 +32,13 @@ def collaborators_input_is_valid(string) -> tuple[list, bool]:
         return collaborators, True
 
 def project_search(search_input: str, projects_list):
+    """
+    A search input parser for searching projects
+    in a given list of such.
+
+    The accepted syntax for a search query is
+    "key_1=<value_1>, key_2=<value_2>, ..."
+    """
 
     SEARCH_ATTRIBUTES = [
         "title_contains",
@@ -158,6 +175,13 @@ def project_search(search_input: str, projects_list):
 
 
 def task_search(search_input: str, tasks_list):
+    """
+    A search input parser for searching tasks
+    in a given list of such.
+
+    The accepted syntax for a search query is
+    "key_1=<value_1>, key_2=<value_2>, ..."
+    """
 
     SEARCH_ATTRIBUTES = [
         "title_contains",

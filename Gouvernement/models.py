@@ -17,6 +17,13 @@ user_task = db.Table("user_task",
                         db.Column("task_id", db.Integer, db.ForeignKey("task.id")))
 
 class Project(db.Model):
+    """
+    Project class with the following relationships:
+
+    Project-to-supervisor == N-to-1
+    Project-to-collaborator = N-to-N
+    Project-to-task = 1-to-N
+    """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
     priority = db.Column(db.Integer)
@@ -31,6 +38,9 @@ class Project(db.Model):
 
     @hybrid_property
     def progress(self):
+        """
+        A hybrid property defined for in-Python reference as a column
+        """
         lst = Task.query.filter_by(parent_project=self.id).all()
         bool_list = [task.status for task in lst]
         if len(bool_list) == 0:
@@ -40,6 +50,9 @@ class Project(db.Model):
 
     @progress.expression
     def progress(cls):
+        """
+        An expression defined for SQL querying
+        """
         total = func.count(Task.id)
         completed = func.sum(case((Task.status == False, 1), else_=0))
         pct_expr = case(
@@ -53,6 +66,14 @@ class Project(db.Model):
         )
 
 class User(db.Model, UserMixin):
+    """
+    User class with the following relationships:
+
+    User(supervisor)-to-project == 1-to-N
+    User(collaborator)-to-project = N-to-N
+    User(assigner)-to-task = 1-to-N
+    User(assignee)-to-task = N-to-N
+    """
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
@@ -68,6 +89,13 @@ class User(db.Model, UserMixin):
     has_assigned_tasks = db.relationship("Task")
 
 class Task(db.Model):
+    """
+    Task class with the following relationships:
+
+    Task-to-assigner == N-to-1
+    Task-to-assignee = N-to-N
+    Task-to-project = N-to-1
+    """
     id = db.Column(db.Integer, primary_key=True)
     parent_project = db.Column(db.Integer, db.ForeignKey("project.id"))
     title = db.Column(db.String(200))

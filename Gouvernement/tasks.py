@@ -42,7 +42,7 @@ tasks = Blueprint("tasks", __name__)
                "/views/projects/<int:project_id>")
 def task_initiate(project_id):
     """
-    Returns the web page where a new task is created
+    Governs the web page where a new task is created
     """
     if request.method == "POST":
         title = request.form.get("title")
@@ -121,6 +121,9 @@ def task_info(project_id, task_id):
                "The project supervisor has closed this project. Tasks can no longer be initiated or edited.",
                "/views/projects/<int:project_id>")
 def edit_task_info(project_id, task_id):
+    """
+    Governs the page for task editing
+    """
     if request.method == "POST":
         title = request.form.get("title")
         priority = request.form.get("priority")
@@ -173,6 +176,9 @@ def edit_task_info(project_id, task_id):
                "You have to have assigned this task to be able to delete it.",
                "/views/projects")
 def delete_task(project_id, task_id):
+    """
+    Governs the page for task deletion
+    """
     task = Task.query.get(task_id)
     was = task.title
     was_project = Task.query.get(project_id).title

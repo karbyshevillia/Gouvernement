@@ -17,7 +17,7 @@ def role_required(check: callable, message: str, back_route_unauth: str):
     """
     A decorator that:
       1. Always passes `current_user` as the first argument to your `check`.
-      2. Introspects `check`’s signature to pick up only the route kwargs it declares.
+      2. Introspects the signature of the `check` function to pick up only the route kwargs it declares.
       3. If the check fails, flashes `message` and redirects to `referrer` or `back_route_unauth`.
     """
     sig = signature(check)
@@ -44,23 +44,43 @@ def role_required(check: callable, message: str, back_route_unauth: str):
     return decorator
 
 def is_project_supervisor(user, project_id):
+    """
+    Checks if a given user is the supervisor of a given project
+    """
     project = Project.query.get(project_id)
     return project.supervisor == user.id
 
 def is_project_collaborator(user, project_id):
+    """
+    Checks if a given user is among
+    the current collaborators of a given project
+    """
     project = Project.query.get(project_id)
     return any(c.id == user.id for c in project.current_collaborators)
 
 def is_project_supervisor_or_collaborator(user, project_id):
+    """
+    Checks if a given user is in any way related to a project
+    """
     return is_project_supervisor(user, project_id) or is_project_collaborator(user, project_id)
 
 def is_task_assigner(user, task_id):
+    """
+    Checks if a given user is the assigner of a given task
+    """
     task = Task.query.get(task_id)
     return task.assigned_by == user.id
 
 def is_task_assignee(user, task_id):
+    """
+    Checks if a given user is among
+    the current assignees of a given task
+    """
     task = Task.query.get(task_id)
     return any(c.id == user.id for c in task.current_assignees)
 
 def is_task_assigner_or_assignee(user, task_id):
+    """
+    Checks if a given user is in any way related to a task
+    """
     return is_task_assigner(user, task_id) or is_task_assignee(user, task_id)
