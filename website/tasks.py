@@ -3,7 +3,7 @@ This file contains the front-end views that determine the web interface for task
 """
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User, Task, Task
+from .models import User, Project, Task
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
@@ -41,7 +41,7 @@ def task_initiate(parent_project_id):
             flash("The assignees field is either improperly filled out, "
                   "or some email is unregistered.", category="error")
         else:
-            parent_project = Task.query.get(parent_project_id)
+            parent_project = Project.query.get(parent_project_id)
             task = Task(title=title,
                         parent_project=parent_project.id,
                         priority=priority,

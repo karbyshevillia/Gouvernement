@@ -75,7 +75,7 @@
 <div class="row mt-4">
   <div class="col-md-12 col-lg-12 mb-4">
     <a href="/tasks/{{ project.id }}/task{{ task.id }}" class="text-decoration-none">
-      <div class="card h-100 shadow-sm border-primary clickable-box">
+      <div class="card h-100 shadow-sm border-primary clickable-box" style="opacity: {{ '0.4' if not task.status else 1 }}">
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <span class="font-weight-bold" style="color: purple">Priority {{ task.priority }}</span>

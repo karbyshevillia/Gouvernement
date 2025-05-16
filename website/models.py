@@ -41,7 +41,7 @@ class Project(db.Model):
     @progress.expression
     def progress(cls):
         total = func.count(Task.id)
-        completed = func.sum(case((Task.status == True, 1), else_=0))
+        completed = func.sum(case((Task.status == False, 1), else_=0))
         pct_expr = case(
             (total == 0, 100),
             else_=completed * 100.0 / total
