@@ -8,6 +8,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 from .aux.tools import collaborators_input_is_valid, project_search, task_search
+from .aux.user_rights import (role_required,
+                              is_project_supervisor,
+                              is_project_collaborator,
+                              is_project_supervisor_or_collaborator)
 from datetime import datetime
 from sqlalchemy import or_, and_
 
@@ -17,7 +21,7 @@ views = Blueprint("views", __name__)
 @login_required
 def projects():
     """
-    Returns the home page of the website
+    Returns the home page of the Gouvernement
     """
     # projects_list = list(set(current_user.projects) | set(current_user.supervised_projects))
     projects_list = Project.query.filter(or_(Project.supervisor == current_user.id,
@@ -44,19 +48,23 @@ def project_initiate():
         status = request.form.get("status")
 
         clb, val = collaborators_input_is_valid(collaborators)
-        deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
-        status = bool(status)
-        # print(clb, val)
-        # print(deadline)
 
-        if len(title) > 200:
-            flash("The project title is too long (>200 characters).", category="error")
-        elif len(description) > 1200:
-            flash("The project description is too long (>1200 characters).", category="error")
+        if not 1 <= len(title) <= 200:
+            flash("The project title length must be between 1 and 200 characters.", category="error")
+        elif not priority:
+            flash("The project priority has not been set.", category="error")
+        elif not 1 <= len(description) <= 1200:
+            flash("The project description length must be between 1 and 1200 characters.", category="error")
+        elif not deadline:
+            flash("The project deadline has not been set.", category="error")
         elif not val:
             flash("The collaborators field is either improperly filled out, "
                   "or some email is unregistered.", category="error")
+        elif not status:
+            flash("The project status has not been set.", category="error")
         else:
+            deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
+            status = bool(int(status))
             project = Project(title=title,
                            priority=priority,
                            description=description,
@@ -73,8 +81,11 @@ def project_initiate():
 
     return render_template("projects_init.html", user=current_user)
 
-@views.route("/projects/<project_id>/edit", methods=["GET", "POST"])
+@views.route("/projects/<int:project_id>/edit", methods=["GET", "POST"])
 @login_required
+@role_required(is_project_supervisor,
+               "You have to supervise this project to be able to edit its info.",
+               "/views/projects/<project_id>")
 def edit_project_info(project_id):
     if request.method == "POST":
         title = request.form.get("title")
@@ -85,19 +96,23 @@ def edit_project_info(project_id):
         status = request.form.get("status")
 
         clb, val = collaborators_input_is_valid(collaborators)
-        deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
-        status = bool(int(status))
-        # print(clb, val)
-        # print(deadline)
 
-        if len(title) > 200:
-            flash("The project title is too long (>200 characters).", category="error")
-        elif len(description) > 1200:
-            flash("The project description is too long (>1200 characters).", category="error")
+        if not 1 <= len(title) <= 200:
+            flash("The project title length must be between 1 and 200 characters.", category="error")
+        elif not priority:
+            flash("The project priority has not been set.", category="error")
+        elif not 1 <= len(description) <= 1200:
+            flash("The project description length must be between 1 and 1200 characters.", category="error")
+        elif not deadline:
+            flash("The project deadline has not been set.", category="error")
         elif not val:
             flash("The collaborators field is either improperly filled out, "
                   "or some email is unregistered.", category="error")
+        elif not status:
+            flash("The project status has not been set.", category="error")
         else:
+            deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
+            status = bool(int(status))
             project = Project.query.get(project_id)
             project.title = title
             project.priority = priority
@@ -116,8 +131,11 @@ def edit_project_info(project_id):
                            project=project,
                            collaborators_string=collaborators_string)
 
-@views.route("/projects/<project_id>/delete", methods=["POST"])
+@views.route("/projects/<int:project_id>/delete", methods=["POST"])
 @login_required
+@role_required(is_project_supervisor,
+               "You have to supervise this project to be able to delete it.",
+               "/views/projects/<project_id>")
 def delete_project(project_id):
     project = Project.query.get(project_id)
     was = project.title
@@ -127,8 +145,11 @@ def delete_project(project_id):
     flash(f"Project {was} has been deleted.", "success")
     return redirect(url_for("views.projects"))
 
-@views.route("/projects/<project_id>", methods=["GET", "POST"])
+@views.route("/projects/<int:project_id>", methods=["GET", "POST"])
 @login_required
+@role_required(is_project_supervisor_or_collaborator,
+               "You have to supervise this project or be its current collaborator to be able to view its info.",
+               "/views/projects")
 def projects_info(project_id):
     """
     Shews information about a Project as accessed

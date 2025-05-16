@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from faker import Faker
-from website import db
+from Gouvernement import db
 from main import app
-from website.models import User, Project, Task
+from Gouvernement.models import User, Project, Task
 from werkzeug.security import generate_password_hash
 import random
 

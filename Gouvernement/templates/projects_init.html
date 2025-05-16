@@ -16,16 +16,17 @@
             value="{% block default_title %}{% endblock %}">
     </div>
     <div class="form-group">
-        <label for="priority">Priority</label>
-        <input
-            type="number"
-            class="form-control"
-            id="priority"
-            name="priority"
-            min = "1"
-            max = "5"
-            placeholder="Enter priority ranking, 1 being the highest, 5 the lowest"
-            value="{% block default_priority %}{% endblock %}">
+        {% block default_priority %}
+            <label for="priority">Priority</label>
+            <select class="form-control" id="priority" name="priority">
+              <option selected disabled>Set project priority</option>
+              <option value="1">1 (HIGHEST)</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5 (LOWEST)</option>
+            </select>
+        {% endblock %}
     </div>
     <div class="form-group">
         <label for="description">Description</label>
@@ -58,16 +59,14 @@
             value="{% block default_collaborators %}{% endblock %}">
     </div>
     <div class="form-group">
-        <label for="status">Status</label>
-        <input
-            type="number"
-            class="form-control"
-            id="status"
-            name="status"
-            min="0"
-            max="1"
-            placeholder="Set the status of the project, 0 being 'unfinished' and 1 being 'finished'"
-            value="{% block default_status %}{% endblock %}">
+        {% block default_status %}
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option selected disabled>Set project status</option>
+              <option value="1">OPEN</option>
+              <option value="0">CLOSED</option>
+            </select>
+        {% endblock %}
     </div>
     <br>
     <div class="d-flex justify-content-center">

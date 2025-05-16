@@ -22,7 +22,7 @@
       <dd class="col-sm-9">{{ supervisor }}</dd>
 
       <dt class="col-sm-3">Date Initiated:</dt>
-      <dd class="col-sm-9">{{ project.creation_date }}</dd>
+      <dd class="col-sm-9">{{ project.creation_date }} (UTC)</dd>
 
       <dt class="col-sm-3">Deadline:</dt>
       <dd class="col-sm-9">{{ project.deadline }}</dd>
@@ -41,7 +41,7 @@
 
       <dt class="col-sm-3">Status:</dt>
       <dd class="col-sm-9">
-        {{ "Open" if project.status else "Closed" }}
+        <strong>{{ "Open" if project.status else "Closed" }}</strong>
       </dd>
     </dl>
   </div>
@@ -60,7 +60,7 @@
 
 <h2 class="text-center pt-5">Related Tasks</h2>
 <div class="d-flex my-3 justify-content-between">
-  <a href="/tasks/{{ project.id }}/initiate" class="mr-3">
+  <a href="/tasks/project/{{ project.id }}/initiate" class="mr-3">
       <button type="button" class="btn btn-primary font-weight-bold">Assign Task</button>
   </a>
   <form method="POST" class="flex-grow-1">
@@ -71,31 +71,37 @@
   </form>
 </div>
 
-{% for task, assigned_by in tasks_assigned_by.items() %}
-<div class="row mt-4">
-  <div class="col-md-12 col-lg-12 mb-4">
-    <a href="/tasks/{{ project.id }}/task{{ task.id }}" class="text-decoration-none">
-      <div class="card h-100 shadow-sm border-primary clickable-box" style="opacity: {{ '0.4' if not task.status else 1 }}">
-        <div class="card-body">
-          <div class="d-flex justify-content-between">
-            <span class="font-weight-bold" style="color: purple">Priority {{ task.priority }}</span>
-            <span class="font-weight-bold text-center" style="color: black">{{ "Open" if task.status else "Closed" }} | Due {{ task.deadline }}</span>
-          </div>
-          <hr class="border-dark">
-          <h5 class="card-title text-primary font-weight-bold">{{ task.title }}</h5>
-          <p class="card-text text-dark">
-            {{ task.description }}
-          </p>
-          <hr class="border-dark">
-          <div class="d-flex justify-content-between">
-            <span class="font-weight-bold" style="color: purple">Assigned by {{ assigned_by.email }} ({{ assigned_by.first_name }})</span>
-            <span class="font-weight-bold text-right" style="color: purple"> {{ task.current_assignees|length }} assignee(s)</span>
+{% if tasks_assigned_by %}
+  {% for task, assigned_by in tasks_assigned_by.items() %}
+  <div class="row mt-4">
+    <div class="col-md-12 col-lg-12 mb-4">
+      <a href="/tasks/project/{{ project.id }}/task/{{ task.id }}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm border-primary clickable-box" style="opacity: {{ '0.4' if not task.status else 1 }}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span class="font-weight-bold" style="color: purple">Priority {{ task.priority }}</span>
+              <span class="font-weight-bold text-center" style="color: black"><strong>{{ "Open" if task.status else "Closed" }}</strong> | Due {{ task.deadline }}</span>
+            </div>
+            <hr class="border-dark">
+            <h5 class="card-title text-primary font-weight-bold">{{ task.title }}</h5>
+            <p class="card-text text-dark">
+              {{ task.description }}
+            </p>
+            <hr class="border-dark">
+            <div class="d-flex justify-content-between">
+              <span class="font-weight-bold" style="color: purple">Assigned by {{ assigned_by.email }} ({{ assigned_by.first_name }})</span>
+              <span class="font-weight-bold text-right" style="color: purple"> {{ task.current_assignees|length }} assignee(s)</span>
+            </div>
           </div>
         </div>
-      </div>
-    </a>
+      </a>
+    </div>
   </div>
+  {% endfor %}
+{% else %}
+<div class="d-flex justify-content-center align-items-center vh-75" style="height: 90px">
+    <h5 class="text-center" style="opacity: 0.4">There is nothing here. Are your search filters in order?</h5>
 </div>
-{% endfor %}
+{% endif %}
 
 {% endblock %}

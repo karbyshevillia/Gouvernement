@@ -3,19 +3,19 @@ from unittest.mock import MagicMock, patch
 import datetime
 
 # Import your functions
-from website.aux.tools import collaborators_input_is_valid, project_search, task_search
+from Gouvernement.aux.tools import collaborators_input_is_valid, project_search, task_search
 from main import app
-from website.models import *
+from Gouvernement.models import *
 
 class TestAuxiliaryTools(unittest.TestCase):
 
-    @patch('website.models.User')
+    @patch('Gouvernement.models.User')
     def test_collaborators_input_is_valid_empty(self, mock_user):
         collaborators, valid = collaborators_input_is_valid("")
         self.assertTrue(valid)
         self.assertEqual(collaborators, [])
 
-    @patch('website.models.User')
+    @patch('Gouvernement.models.User')
     def test_collaborators_input_is_valid_valid_email(self, mock_user):
         # Setup mock return for a valid user
         with app.app_context():
@@ -27,7 +27,7 @@ class TestAuxiliaryTools(unittest.TestCase):
             self.assertTrue(valid)
             self.assertEqual(collaborators, ["UserObject"])
 
-    @patch('website.models.User')
+    @patch('Gouvernement.models.User')
     def test_collaborators_input_is_valid_invalid_email(self, mock_user):
         # Setup mock to return None for an invalid user
         with app.app_context():
@@ -69,7 +69,7 @@ class TestAuxiliaryTools(unittest.TestCase):
         self.assertTrue(tasks_list.filter.call_count >= 2)
 
     # Additional tests would mock collaborators_input_is_valid within project_search and task_search
-    @patch('website.aux.tools.collaborators_input_is_valid')
+    @patch('Gouvernement.aux.tools.collaborators_input_is_valid')
     def test_project_search_are_collaborators(self, mock_collab_valid):
         projects_list = MagicMock()
         projects_list.filter.return_value = projects_list

@@ -2,7 +2,7 @@
 Auxiliary tools
 """
 
-from website.models import User, Project, Task
+from Gouvernement.models import User, Project, Task
 import re
 import datetime
 from sqlalchemy.sql import desc, or_
@@ -122,9 +122,9 @@ def project_search(search_input: str, projects_list):
             if value not in SORT_PERMITTED:
                 continue
             elif value == "ASC":
-                projects_list = projects_list.order_by(Project.priority)
-            elif value == "DESC":
                 projects_list = projects_list.order_by(desc(Project.priority))
+            elif value == "DESC":
+                projects_list = projects_list.order_by(Project.priority)
         elif key == "creation_date_sort":
             if value not in SORT_PERMITTED:
                 continue
@@ -248,9 +248,9 @@ def task_search(search_input: str, tasks_list):
             if value not in SORT_PERMITTED:
                 continue
             elif value == "ASC":
-                tasks_list = tasks_list.order_by(Task.priority)
-            elif value == "DESC":
                 tasks_list = tasks_list.order_by(desc(Task.priority))
+            elif value == "DESC":
+                tasks_list = tasks_list.order_by(Task.priority)
         elif key == "creation_date_sort":
             if value not in SORT_PERMITTED:
                 continue

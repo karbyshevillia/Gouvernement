@@ -22,7 +22,7 @@
       <dd class="col-sm-9">{{ assigned_by }}</dd>
 
       <dt class="col-sm-3">Date Assigned:</dt>
-      <dd class="col-sm-9">{{ task.assignment_date }}</dd>
+      <dd class="col-sm-9">{{ task.assignment_date }} (UTC)</dd>
 
       <dt class="col-sm-3">Deadline:</dt>
       <dd class="col-sm-9">{{ task.deadline }}</dd>
@@ -36,17 +36,17 @@
 
       <dt class="col-sm-3">Status:</dt>
       <dd class="col-sm-9">
-        {{ "Open" if task.status else "Closed" }}
+        <strong>{{ "Open" if task.status else "Closed" }}</strong>
       </dd>
     </dl>
   </div>
   <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
     <a href="/views/projects/{{ parent_project_id }}" class="btn btn-outline-primary ml-2">Back to Project Info</a>
     <div>
-      <a href="/tasks/{{ parent_project_id }}/task{{ task.id }}/edit" class="btn btn-outline-primary mr-2">
+      <a href="/tasks/project/{{ parent_project_id }}/task/{{ task.id }}/edit" class="btn btn-outline-primary mr-2">
         Edit
       </a>
-      <form action="/tasks/{{ parent_project_id }}/task{{ task.id }}/delete" method="POST" style="display:inline;">
+      <form action="/tasks/project/{{ parent_project_id }}/task/{{ task.id }}/delete" method="POST" style="display:inline;">
         <button type="submit" class="btn btn-outline-danger">Delete</button>
       </form>
     </div>
