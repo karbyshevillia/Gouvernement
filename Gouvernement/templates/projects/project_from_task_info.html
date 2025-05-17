@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="card my-3 shadow-sm">
+  <div class="card-header bg-gray text-primary">
+    <h2 class="text-center">Project Info</h2>
+  </div>
+  <div class="card-body">
+    <dl class="row">
+      <dt class="col-sm-3">Title:</dt>
+      <dd class="col-sm-9">{{ project.title }}</dd>
+
+      <dt class="col-sm-3">Priority:</dt>
+      <dd class="col-sm-9">{{ project.priority }}</dd>
+
+      <dt class="col-sm-3">Description:</dt>
+      <dd class="col-sm-9">{{ project.description }}</dd>
+
+      <dt class="col-sm-3">Supervisor:</dt>
+      <dd class="col-sm-9">{{ supervisor }}</dd>
+
+      <dt class="col-sm-3">Date Initiated:</dt>
+      <dd class="col-sm-9">{{ project.creation_date }} (UTC)</dd>
+
+      <dt class="col-sm-3">Deadline:</dt>
+      <dd class="col-sm-9">{{ project.deadline }}</dd>
+
+      <dt class="col-sm-3">Current Collaborators:</dt>
+      <dd class="col-sm-9">
+        {% for email in collaborator_emails %}
+          {{ email }}<br>
+        {% endfor %}
+      </dd>
+
+      <dt class="col-sm-3">Progress:</dt>
+      <dd class="col-sm-9">
+        {{ project.progress }}% complete
+      </dd>
+
+      <dt class="col-sm-3">Status:</dt>
+      <dd class="col-sm-9">
+        <strong>{{ "Open" if project.status else "Closed" }}</strong>
+      </dd>
+    </dl>
+  </div>
+  <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+    <a href="/tasks/task/{{ referrer_task_id }}" class="btn btn-outline-primary ml-2">Back to Task Info</a>
+    <div>
+      <a href="/views/projects/{{ project.id }}/edit" class="btn btn-outline-primary mr-2">
+        Edit
+      </a>
+      <form action="/views/projects/{{ project.id }}/delete" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-outline-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<h2 class="text-center pt-5">Related Tasks</h2>
+<div class="d-flex my-3 justify-content-between">
+  <a href="/tasks/project/{{ project.id }}/initiate" class="mr-3">
+      <button type="button" class="btn btn-primary font-weight-bold">Assign Task</button>
+  </a>
+  <form method="POST" class="flex-grow-1">
+    <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Enter filters" name="filters">
+    <button class="btn btn-outline-secondary ml-3" type="submit">Search</button>
+  </div>
+  </form>
+</div>
+
+{% if tasks_assigned_by %}
+  {% for task, assigned_by in tasks_assigned_by.items() %}
+  <div class="row mt-4">
+    <div class="col-md-12 col-lg-12 mb-4">
+      <a href="/tasks/project/{{ project.id }}/task/{{ task.id }}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm border-primary clickable-box" style="opacity: {{ '0.4' if not task.status else 1 }}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span class="font-weight-bold" style="color: purple">Priority {{ task.priority }}</span>
+              <span class="font-weight-bold text-center" style="color: black"><strong>{{ "Open" if task.status else "Closed" }}</strong> | Due {{ task.deadline }}</span>
+            </div>
+            <hr class="border-dark">
+            <h5 class="card-title text-primary font-weight-bold">{{ task.title }}</h5>
+            <p class="card-text text-dark">
+              {{ task.description }}
+            </p>
+            <hr class="border-dark">
+            <div class="d-flex justify-content-between">
+              <span class="font-weight-bold" style="color: purple">Assigned by {{ assigned_by.email }} ({{ assigned_by.first_name }})</span>
+              <span class="font-weight-bold text-right" style="color: purple"> {{ task.current_assignees|length }} assignee(s)</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+<div class="d-flex justify-content-center align-items-center vh-75" style="height: 90px">
+    <h5 class="text-center" style="opacity: 0.4">There is nothing here. Are your search filters in order?</h5>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+<div class="card my-3 shadow-sm">
+  <div class="card-header bg-gray text-primary">
+    <h2 class="text-center">Task Info</h2>
+  </div>
+  <div class="card-body">
+    <dl class="row">
+      <dt class="col-sm-3">Title:</dt>
+      <dd class="col-sm-9">{{ task.title }}</dd>
+
+      <dt class="col-sm-3">Priority:</dt>
+      <dd class="col-sm-9">{{ task.priority }}</dd>
+
+      <dt class="col-sm-3">Description:</dt>
+      <dd class="col-sm-9">{{ task.description }}</dd>
+
+      <dt class="col-sm-3">Assigned by:</dt>
+      <dd class="col-sm-9">{{ assigned_by }}</dd>
+
+      <dt class="col-sm-3">Date Assigned:</dt>
+      <dd class="col-sm-9">{{ task.assignment_date }} (UTC)</dd>
+
+      <dt class="col-sm-3">Deadline:</dt>
+      <dd class="col-sm-9">{{ task.deadline }}</dd>
+
+      <dt class="col-sm-3">Current Assignees:</dt>
+      <dd class="col-sm-9">
+        {% for email in assignee_emails %}
+          {{ email }}<br>
+        {% endfor %}
+      </dd>
+
+      <dt class="col-sm-3">Status:</dt>
+      <dd class="col-sm-9">
+        <strong>{{ "Open" if task.status else "Closed" }}</strong>
+      </dd>
+    </dl>
+  </div>
+  <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+    <div>
+      <a href="/tasks/task/{{ task.id }}/parent={{ parent_project_id }}" class="btn btn-outline-primary ml-2">See Project Info</a>
+      <a href="/tasks/tasks" class="btn btn-outline-primary ml-2">Back to Tasks</a>
+    </div>
+    <div>
+      <a href="/tasks/project/{{ parent_project_id }}/task/{{ task.id }}/edit" class="btn btn-outline-primary mr-2">
+        Edit
+      </a>
+      <form action="/tasks/project/{{ parent_project_id }}/task/{{ task.id }}/delete" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-outline-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

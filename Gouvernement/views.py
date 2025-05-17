@@ -2,12 +2,25 @@
 This file contains the front-end views that determine the web interface.
 """
 
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User, Project, Task
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import (Blueprint,
+                   render_template,
+                   request,
+                   flash,
+                   redirect,
+                   url_for)
+from .models import (User,
+                     Project,
+                     Task)
+from werkzeug.security import (generate_password_hash,
+                               check_password_hash)
 from . import db
-from flask_login import login_user, login_required, logout_user, current_user
-from .aux.tools import collaborators_input_is_valid, project_search, task_search
+from flask_login import (login_user,
+                         login_required,
+                         logout_user,
+                         current_user)
+from .aux.tools import (collaborators_input_is_valid,
+                        project_search,
+                        task_search)
 from .aux.user_rights import (role_required,
                               is_project_supervisor,
                               is_project_collaborator,
@@ -81,6 +94,38 @@ def project_initiate():
 
     return render_template("projects/projects_init.html", user=current_user)
 
+
+@views.route("/projects/<int:project_id>", methods=["GET", "POST"])
+@login_required
+@role_required(is_project_supervisor_or_collaborator,
+               "You have to supervise this project or be its current collaborator to be able to view its info.",
+               "/views/projects")
+def projects_info(project_id):
+    """
+    Shews information about a Project as accessed
+    through the Projects tab by clicking on a Project
+    """
+    project = Project.query.get(project_id)
+    supervisor = User.query.get(project.supervisor).email
+    collaborator_emails = [user.email for user in project.current_collaborators]
+
+    tasks_list = Task.query.filter(and_(or_(Task.assigned_by == current_user.id,
+                                       Task.current_assignees.contains(current_user)),
+                                       Task.parent_project == project_id))
+    if request.method == "POST":
+        search_string = request.form.get("filters")
+        tasks_list = task_search(search_string, tasks_list)
+
+    tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
+
+    return render_template("projects/projects_info.html",
+                           user=current_user,
+                           project=project,
+                           supervisor=supervisor,
+                           collaborator_emails=collaborator_emails,
+                           tasks_assigned_by=tasks_assigned_by)
+
+
 @views.route("/projects/<int:project_id>/edit", methods=["GET", "POST"])
 @login_required
 @role_required(is_project_supervisor,
@@ -150,33 +195,3 @@ def delete_project(project_id):
     db.session.commit()
     flash(f"Project {was} has been deleted.", "success")
     return redirect(url_for("views.projects"))
-
-@views.route("/projects/<int:project_id>", methods=["GET", "POST"])
-@login_required
-@role_required(is_project_supervisor_or_collaborator,
-               "You have to supervise this project or be its current collaborator to be able to view its info.",
-               "/views/projects")
-def projects_info(project_id):
-    """
-    Shews information about a Project as accessed
-    through the Projects tab by clicking on a Project
-    """
-    project = Project.query.get(project_id)
-    supervisor = User.query.get(project.supervisor).email
-    collaborator_emails = [user.email for user in project.current_collaborators]
-
-    tasks_list = Task.query.filter(and_(or_(Task.assigned_by == current_user.id,
-                                       Task.current_assignees.contains(current_user)),
-                                       Task.parent_project == project_id))
-    if request.method == "POST":
-        search_string = request.form.get("filters")
-        tasks_list = task_search(search_string, tasks_list)
-
-    tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
-
-    return render_template("projects/projects_info.html",
-                           user=current_user,
-                           project=project,
-                           supervisor=supervisor,
-                           collaborator_emails=collaborator_emails,
-                           tasks_assigned_by=tasks_assigned_by)
