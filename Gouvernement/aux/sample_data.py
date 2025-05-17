@@ -36,7 +36,7 @@ def create_sample_data():
 
         # Create Projects
         projects = []
-        for _ in range(15):
+        for _ in range(30):
             supervisor = random.choice(users)
             collaborators = random.sample(users, k=random.randint(2, 5))
             project = Project(
@@ -55,7 +55,7 @@ def create_sample_data():
         db.session.commit()
 
         # Create Tasks
-        for _ in range(150):
+        for _ in range(300):
             parent_project = random.choice(projects)
             assigner = random.choice(users)
             assignees = random.sample(users, k=random.randint(1, 6))
