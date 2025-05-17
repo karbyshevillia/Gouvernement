@@ -44,6 +44,8 @@ def tasks_view():
     if request.method == "POST":
         search_string = request.form.get("filters")
         tasks_list = task_search(search_string, tasks_list)
+    if request.method == "GET":
+        tasks_list = task_search("status=<OPEN>, priority_sort=<DESC>", tasks_list)
 
     parent_projects_list = [Project.query.get(task.parent_project) for task in tasks_list]
     zipped = list(zip(tasks_list, parent_projects_list))

@@ -39,9 +39,12 @@ def projects():
     # projects_list = list(set(current_user.projects) | set(current_user.supervised_projects))
     projects_list = Project.query.filter(or_(Project.supervisor == current_user.id,
                                           Project.current_collaborators.contains(current_user)))
+
     if request.method == "POST":
         search_string = request.form.get("filters")
         projects_list = project_search(search_string, projects_list)
+    if request.method == "GET":
+        projects_list = project_search("status=<OPEN>, priority_sort=<DESC>", projects_list)
 
     projects_supervisors = dict(zip(projects_list, [User.query.get(project.supervisor) for project in projects_list]))
     return render_template("projects/projects.html", user=current_user, projects_supervisors=projects_supervisors)
@@ -112,9 +115,12 @@ def projects_info(project_id):
     tasks_list = Task.query.filter(and_(or_(Task.assigned_by == current_user.id,
                                        Task.current_assignees.contains(current_user)),
                                        Task.parent_project == project_id))
+
     if request.method == "POST":
         search_string = request.form.get("filters")
         tasks_list = task_search(search_string, tasks_list)
+    if request.method == "GET":
+        tasks_list = task_search("status=<OPEN>, priority_sort=<DESC>", tasks_list)
 
     tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
 
