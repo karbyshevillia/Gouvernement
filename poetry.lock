@@ -269,6 +269,17 @@ files = [
 ]
 
 [[package]]
+name = "pyclean"
+version = "3.1.0"
+description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pyclean-3.1.0-py3-none-any.whl", hash = "sha256:46652f7416816924cab565cd045d0c341237aced0368a3727d66b5192c16728c"},
+    {file = "pyclean-3.1.0.tar.gz", hash = "sha256:d23fa900558696e08c79401c79f242fe6f7f38fd58ccd035f875a01c5bc7a6fc"},
+]
+
+[[package]]
 name = "sqlalchemy"
 version = "2.0.40"
 description = "Database Abstraction Library"
@@ -405,4 +416,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "40ccfe8339009356cbef22551a31862676a3a0eb3b68fa4d7b7579a16846a045"
+content-hash = "c67a89f8a68bbd8291ffceb5961730d585497f04b58a82c6991be4095f48f048"
