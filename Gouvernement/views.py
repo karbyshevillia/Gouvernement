@@ -31,7 +31,7 @@ def projects():
         projects_list = project_search(search_string, projects_list)
 
     projects_supervisors = dict(zip(projects_list, [User.query.get(project.supervisor) for project in projects_list]))
-    return render_template("projects.html", user=current_user, projects_supervisors=projects_supervisors)
+    return render_template("projects/projects.html", user=current_user, projects_supervisors=projects_supervisors)
 
 @views.route("/initiate", methods=["GET", "POST"])
 @login_required
@@ -79,7 +79,7 @@ def project_initiate():
             flash("Project initiated successfully!", category="success")
             return redirect(url_for("views.projects"))
 
-    return render_template("projects_init.html", user=current_user)
+    return render_template("projects/projects_init.html", user=current_user)
 
 @views.route("/projects/<int:project_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -129,7 +129,7 @@ def edit_project_info(project_id):
 
     project = Project.query.get(project_id)
     collaborators_string = ", ".join([user.email for user in project.current_collaborators])
-    return render_template("projects_edit.html",
+    return render_template("projects/projects_edit.html",
                            user=current_user,
                            project=project,
                            collaborators_string=collaborators_string)
@@ -174,7 +174,7 @@ def projects_info(project_id):
 
     tasks_assigned_by = dict(zip(tasks_list, [User.query.get(task.assigned_by) for task in tasks_list]))
 
-    return render_template("projects_info.html",
+    return render_template("projects/projects_info.html",
                            user=current_user,
                            project=project,
                            supervisor=supervisor,

@@ -85,7 +85,7 @@ def task_initiate(project_id):
             flash("Task initiated successfully!", category="success")
             return redirect(f"/views/projects/{project_id}")
 
-    return render_template("tasks_init.html",
+    return render_template("tasks/tasks_init.html",
                            user=current_user,
                            parent_project_id=project_id)
 
@@ -104,7 +104,7 @@ def task_info(project_id, task_id):
     assigned_by = User.query.get(task.assigned_by).email
     assignee_emails = [user.email for user in task.current_assignees]
 
-    return render_template("tasks_info.html",
+    return render_template("tasks/tasks_info.html",
                            user=current_user,
                            task=task,
                            assigned_by=assigned_by,
@@ -163,7 +163,7 @@ def edit_task_info(project_id, task_id):
 
     task = Task.query.get(task_id)
     assignees_string = ", ".join([user.email for user in task.current_assignees])
-    return render_template("tasks_edit.html",
+    return render_template("tasks/tasks_edit.html",
                            user=current_user,
                            task=task,
                            assignees_string=assignees_string,
