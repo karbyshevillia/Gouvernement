@@ -1,0 +1,29 @@
+{% extends "tasks/tasks_init.html" %}
+
+{% block default_title %}{{ task.title }}{% endblock %}
+{% block default_priority %}
+    <label for="priority">Priority</label>
+    <select class="form-control" id="priority" name="priority">
+      <option value="1" {% if task.priority == 1 %}selected{% endif %}>1 (HIGHEST)</option>
+      <option value="2" {% if task.priority == 2 %}selected{% endif %}>2</option>
+      <option value="3" {% if task.priority == 3 %}selected{% endif %}>3</option>
+      <option value="4" {% if task.priority == 4 %}selected{% endif %}>4</option>
+      <option value="5" {% if task.priority == 5 %}selected{% endif %}>5 (LOWEST)</option>
+    </select>
+{% endblock %}
+{% block default_description %}{{ task.description }}{% endblock %}
+{% block default_deadline %}{{ task.deadline.strftime('%Y-%m-%dT%H:%M') }}{% endblock %}
+{% block default_assignees %}{{ assignees_string }}{% endblock %}
+{% block default_status %}
+    <label for="status">Status</label>
+    <select class="form-control" id="status" name="status">
+      <option value="1" {% if task.status %}selected{% endif %}>OPEN</option>
+      <option value="0" {% if not task.status %}selected{% endif %}>CLOSED</option>
+    </select>
+{% endblock %}
+
+{% block commit_button %} Save Changes {% endblock %}
+
+{% block discard_button %}
+    <a href="/tasks/project/{{ parent_project_id }}/task/{{ task.id }}" class="btn btn-outline-primary ml-2">Discard Changes</a>
+{% endblock %}
