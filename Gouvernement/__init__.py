@@ -13,7 +13,7 @@ def create_app():
     Initialisation of a Flask app running as a WSGI server
     """
 
-    app = Flask(__name__, instance_path="/Users/illiaknu/Gouvernement")
+    app = Flask(__name__, instance_relative_config=True)
     app.config["SECRET_KEY"] = "314159265358979323846264339"
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_NAME}"
     db.init_app(app)
