@@ -30,7 +30,7 @@ ___
 
 First of all, clone the project repository and switch to the corresponding directory:
 ```bash
-$ git clone https://github.com/codemorphist/DigitalGarden.git --depth 1
+$ git clone https://github.com/karbyshevillia/Gouvernement.git --depth 1
 $ cd Gouvernement
 ```
 
